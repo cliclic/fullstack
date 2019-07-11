@@ -1,14 +1,14 @@
 import { ModelType } from 'typegoose'
-import UserModel, { User } from './UserEntity'
+import GameModel, { Game } from './GameEntity'
 
-export class UserService {
-  private readonly model: ModelType<User>
+export class GameService {
+  private readonly model: ModelType<Game>
 
   constructor() {
-    this.model = UserModel
+    this.model = GameModel
   }
 
-  async find(selector?: Partial<User>) {
+  async find(selector?: Partial<Game>) {
     return this.model.find(selector)
   }
 
@@ -19,9 +19,5 @@ export class UserService {
   async remove(_id: string) {
     let entityToRemove = await this.model.findOne(_id)
     await this.model.remove(entityToRemove)
-  }
-
-  async count(entity: any) {
-    return this.model.count(entity)
   }
 }

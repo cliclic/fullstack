@@ -1,123 +1,52 @@
-import { Arg, Resolver, Query, Authorized, Mutation, Ctx, ID, InputType, Field } from 'type-graphql'
-import { Context } from '../common/context'
-import { UserService } from './UserService'
-import { User, Profile } from './UserEntity'
-import './enums'
-import { accountsPassword } from './accounts'
+import { UserInputError } from 'apollo-server'
+import { combineResolvers } from 'graphql-resolvers'
+import { isAuthenticated, requiresRole } from '../common/resolvers'
 import { Role } from './consts'
-import { client as plaid } from '../payments/plaid'
+import * as userService from './UserService'
 
-@InputType()
-class ProfileInput implements Partial<Profile> {
-  @Field(type => String)
-  firstName: string
-
-  @Field(type => String)
-  lastName: string
+function queryMeResolver(_, __, context) {
+  return context.user
 }
 
-@InputType()
-class CreateUserInput implements Partial<User> {
-  @Field(type => String)
-  email: string
-
-  @Field(type => String)
-  password: string
-
-  @Field(type => ProfileInput)
-  profile: ProfileInput
+async function queryUsersResolver() {
+  return await userService.find({})
 }
 
-@InputType()
-export class PropertyInput {
-  @Field(type => String)
-  address: string
-
-  @Field(type => String)
-  placeId: string
-
-  @Field(type => Number)
-  rentAmount: number
+async function createUserResolver(_, fields) {
+  try {
+    return await userService.create(fields)
+  } catch (e) {
+    throw new UserInputError('Cannot create User', { invalidArgs: Object.keys(fields) })
+  }
 }
 
-@Resolver(User)
-export default class UserResolver {
-  private readonly service: UserService
-
-  constructor() {
-    this.service = new UserService()
+async function updateUserResolver(_, fields) {
+  let user
+  try {
+    user = await userService.findById(fields.id)
+  } catch (e) {
+    throw new UserInputError('Unknown User', { invalidArgs: ['id'] })
   }
-
-  @Query(returns => User)
-  @Authorized()
-  async me(@Ctx() ctx: Context) {
-    if (ctx.userId) {
-      return await this.service.findOneById(ctx.userId)
-    }
+  try {
+    return await userService.update(user, fields)
+  } catch (e) {
+    throw new UserInputError('Cannot update User', { invalidArgs: Object.keys(fields) })
   }
+}
 
-  // this overrides accounts js `createUser` function
-  @Mutation(returns => ID)
-  async createUser(@Arg('user', returns => CreateUserInput) user: CreateUserInput) {
-    const createdUserId = await accountsPassword.createUser({
-      ...user,
-      roles: [Role.User],
-    })
+async function updateMeResolver(_, fields, { user }) {
+  fields.id = user.id
+  return await updateUserResolver(_, fields)
+}
 
-    return createdUserId
-  }
-
-  @Mutation(returns => Boolean)
-  @Authorized()
-  async onboardUser(
-    @Arg('publicToken') publicToken: string,
-    @Arg('property') property: PropertyInput,
-    @Ctx() ctx: Context
-  ) {
-    return new Promise((resolve, reject) => {
-      plaid.exchangePublicToken(publicToken, async (err, response) => {
-        if (err != null) reject(err)
-
-        const user = await this.service.findOneById(ctx.userId)
-        user.plaid = {
-          accessToken: response.access_token,
-          itemId: response.item_id,
-        }
-        user.properties = [property]
-        user.isOnboarded = true
-        await user.save()
-
-        resolve(true)
-      })
-    })
-  }
-
-  @Mutation(returns => Boolean)
-  @Authorized()
-  async setPlaidToken(@Arg('publicToken') publicToken: string, @Ctx() ctx: Context) {
-    return new Promise((resolve, reject) => {
-      plaid.exchangePublicToken(publicToken, async (err, response) => {
-        if (err != null) reject(err)
-
-        const user = await this.service.findOneById(ctx.userId)
-        user.plaid = {
-          accessToken: response.access_token,
-          itemId: response.item_id,
-        }
-        await user.save()
-
-        resolve(true)
-      })
-    })
-  }
-
-  // @FieldResolver(returns => String)
-  // async firstName(@Root() user: User) {
-  //   return user.profile.firstName
-  // }
-
-  // @FieldResolver(returns => String)
-  // async lastName(@Root() user: User) {
-  //   return user.profile.lastName
-  // }
+export default {
+  Query: {
+    me: combineResolvers(isAuthenticated, queryMeResolver),
+    users: combineResolvers(requiresRole(Role.Admin), queryUsersResolver),
+  },
+  Mutation: {
+    createUser: combineResolvers(requiresRole(Role.Admin), createUserResolver),
+    updateUser: combineResolvers(requiresRole(Role.Admin), updateUserResolver),
+    updateMe: combineResolvers(isAuthenticated, updateMeResolver),
+  },
 }
