@@ -1,4 +1,4 @@
-import {User, UserModel} from './UserEntity'
+import {UserInstance, UserModel} from './UserEntity'
 import {passwordEncode} from "../common/helpers";
 import {Role} from "./consts";
 
@@ -13,7 +13,7 @@ export async function count () {
   return await UserModel.countDocuments();
 }
 
-export async function update(user: User, fields: Partial<UserInput>) {
+export async function update(user: UserInstance, fields: Partial<UserInput>) {
     const {roles, displayName, password} = fields;
 
     if (typeof roles !== 'undefined' && Array.isArray(roles)) {

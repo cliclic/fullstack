@@ -1,5 +1,6 @@
+import { SERVER_URL } from './env'
 import axios from 'axios'
 
 export const restClient = axios.create({
-  baseUrl: '',
+  baseURL: SERVER_URL,
 })

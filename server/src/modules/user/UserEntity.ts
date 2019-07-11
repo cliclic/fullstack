@@ -1,4 +1,4 @@
-import { index, prop, Typegoose } from 'typegoose'
+import { index, prop, Typegoose, InstanceType } from 'typegoose'
 import { Role } from './consts'
 
 export interface AccessToken {
@@ -7,7 +7,7 @@ export interface AccessToken {
 }
 
 @index({ 'tokens.id': 1 })
-export class User extends Typegoose {
+class User extends Typegoose {
   @prop({ required: true, index: true, unique: true })
   username: string
 
@@ -33,3 +33,5 @@ export class User extends Typegoose {
 export const UserModel = new User().getModelForClass(User, {
   schemaOptions: { timestamps: true },
 })
+
+export type UserInstance = InstanceType<User>;

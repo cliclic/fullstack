@@ -1,6 +1,6 @@
 import ApolloClient from 'apollo-boost'
-import { GRAPHQL_URL } from './env'
+import { SERVER_URL } from './env'
 
 export const apolloClient = new ApolloClient({
-  uri: GRAPHQL_URL,
+  uri: SERVER_URL,
 })

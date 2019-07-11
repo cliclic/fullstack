@@ -1,37 +1,40 @@
 import { Application } from 'express'
 import * as bodyParser from 'body-parser'
 import * as cookieParser from 'cookie-parser'
-import { AccessToken, User, UserModel } from '../modules/user/UserEntity'
+import { AccessToken, UserInstance, UserModel } from '../modules/user'
 import { passwordValidate } from '../modules/common/helpers'
 import { v4 as uuidv4 } from 'uuid'
 
 declare global {
   namespace Express {
     export interface Request {
-      user?: User
+      user?: UserInstance
     }
   }
 }
 
-const urlencodedParser = bodyParser.urlencoded()
+const urlencodedParser = bodyParser.urlencoded({extended: true});
 
 export function createAuthServer(app: Application) {
-  app.use(cookieParser())
+  app.use(cookieParser());
 
   app.post('/login', urlencodedParser, async function(req, res) {
     try {
       const user = await UserModel.findOne({ username: new RegExp(req.body.u, 'i') })
       if (passwordValidate(req.body.c, user.password)) {
+        console.log ('password is valid');
         try {
           if (user.tokens.length === 0) {
+            console.log ('user has no token');
             const token: AccessToken = {
               token: uuidv4(),
               createdAt: new Date(),
             }
-            user.tokens.push(token)
+            user.tokens = [token];
             await user.save()
           }
-          res.json({ accessToken: user.tokens[0] })
+          console.log ('response', { accessToken: user.tokens[0] });
+          res.json({ accessToken: user.tokens[0] });
         } catch (e) {
           res.sendStatus(500)
         }

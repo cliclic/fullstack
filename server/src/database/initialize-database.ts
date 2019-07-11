@@ -12,6 +12,8 @@ export default async function initializeDatabase(db: Connection) {
       displayName: 'Admin',
       roles: ['admin', 'user'],
       password: passwordEncode(ADMIN_USER_PASSWORD),
-    })
+    });
+
+    adminUser.save();
   }
 }
