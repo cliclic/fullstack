@@ -4,25 +4,6 @@ export enum Environments {
   prod = 'production',
 }
 
-export enum PlaidEnvs {
-  sandbox = 'sandbox',
-  tartan = 'tartan',
-  production = 'production',
-}
-
-export enum PlaidCountryCodes {
-  US = 'US',
-}
-
-export enum PlaidProducts {
-  transactions = 'transactions',
-  auth = 'auth',
-  connect = 'connect',
-  info = 'info',
-  risk = 'risk',
-  income = 'income',
-}
-
 export interface PlaidObj {
   open(): void
   exit(opts?: { force: boolean }): void

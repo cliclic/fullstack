@@ -63,13 +63,16 @@ export function createAuthServer(app: Application) {
   })
 
   app.use('/graphql', async function(req, res, next) {
-    const { token } = req.cookies
-    if (token) {
+    const { c } = req.cookies;
+    console.log (req.cookies);
+    if (c) {
       try {
-        req.user = await UserModel.findOne({ tokens: { $elemMatch: { token } } })
+        req.user = await UserModel.findOne({ tokens: { $elemMatch: { token: c } } })
+        return next();
       } catch (e) {
         console.error('Request with unknown token', req.cookies.token)
       }
     }
+    next();
   })
 }

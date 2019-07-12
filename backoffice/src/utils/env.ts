@@ -1,4 +1,4 @@
-import { Environments, PlaidEnvs, PlaidCountryCodes, PlaidProducts } from './types'
+import { Environments } from './types'
 
 interface ENV {
   NODE_ENV: Environments
