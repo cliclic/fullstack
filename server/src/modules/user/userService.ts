@@ -34,6 +34,7 @@ export async function update(user: UserInstance, fields: Partial<UserInput>) {
 }
 
 export async function create(fields: UserInput) {
+    console.log (fields);
     const user = await UserModel.create(fields);
     await user.save();
     return user;

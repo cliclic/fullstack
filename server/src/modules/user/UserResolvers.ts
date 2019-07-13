@@ -14,8 +14,9 @@ async function queryUsersResolver() {
 
 async function createUserResolver(_, fields) {
   try {
-    return await userService.create(fields)
+    return await userService.create(fields.input)
   } catch (e) {
+    console.error (e);
     throw new UserInputError('Cannot create User', { invalidArgs: Object.keys(fields) })
   }
 }

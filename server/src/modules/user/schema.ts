@@ -8,6 +8,7 @@ scalar DateTime
 enum Role {
     user
     admin
+    super
 }
 
 type AccessToken {
@@ -45,9 +46,14 @@ type Query {
 }
 
 type Mutation {
-    createUser(input: UpdateUserInput) : User
+    createUser(input: CreateUserInput) : User
     updateUser(id: ID, input: UpdateUserInput) : User
     updateMe(input: UpdateUserInput) : User
+    deleteUser(id: ID) : MutationResponse
+}
+
+type MutationResponse {
+    success: Boolean!
 }
 `;
 
