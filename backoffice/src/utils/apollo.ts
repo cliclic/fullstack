@@ -1,6 +1,8 @@
 import ApolloClient from 'apollo-boost'
-import { SERVER_URL } from './env'
+import { GRAPHQL_PATH } from './env'
+import {LocalCache} from "../components/common/consts";
 
-export const apolloClient = new ApolloClient({
-  uri: SERVER_URL,
-})
+export const apolloClient = new ApolloClient<LocalCache>({
+  uri: GRAPHQL_PATH,
+  credentials: 'include'
+});

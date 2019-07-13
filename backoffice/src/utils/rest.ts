@@ -1,6 +1,7 @@
-import { SERVER_URL } from './env'
 import axios from 'axios'
+import {API_PATH} from "./env";
 
 export const restClient = axios.create({
-  baseURL: SERVER_URL,
-})
+  baseURL: API_PATH,
+  headers: {'Accept': 'application/json'}
+});

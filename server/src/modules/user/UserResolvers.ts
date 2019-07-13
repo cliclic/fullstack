@@ -28,14 +28,15 @@ async function updateUserResolver(_, fields) {
     throw new UserInputError('Unknown User', { invalidArgs: ['id'] })
   }
   try {
-    return await userService.update(user, fields)
+    return await userService.update(user, fields.input)
   } catch (e) {
     throw new UserInputError('Cannot update User', { invalidArgs: Object.keys(fields) })
   }
 }
 
 async function updateMeResolver(_, fields, { user }) {
-  fields.id = user.id
+  fields.id = user._id;
+  delete fields.input.roles;
   return await updateUserResolver(_, fields)
 }
 
@@ -46,7 +47,7 @@ export default {
   },
   Mutation: {
     createUser: combineResolvers(requiresRole(Role.Admin), createUserResolver),
-    updateUser: combineResolvers(requiresRole(Role.Admin), updateUserResolver),
+    updateUser: combineResolvers(requiresRole(Role.Admin, Role.User), updateUserResolver),
     updateMe: combineResolvers(isAuthenticated, updateMeResolver),
   },
 }

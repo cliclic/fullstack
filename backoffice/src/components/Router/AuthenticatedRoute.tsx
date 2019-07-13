@@ -14,7 +14,7 @@ export default withCookies(function AuthenticatedRoute({component: C, props: cPr
             render={props =>
                 cookies && cookies.get('authenticated') ? (
                     // @ts-ignore
-                    <C {...props} {...cProps} />
+                    C ? <C {...props} {...cProps} /> : {...cProps.children}
                 ) : (
                     <Redirect to={`/login?redirect=${props.location.pathname}${props.location.search}`}/>
                 )

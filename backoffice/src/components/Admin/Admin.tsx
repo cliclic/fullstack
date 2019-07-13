@@ -1,23 +1,12 @@
-import {Fragment} from 'react'
-import {Query, withQuery} from "react-apollo";
-import {ApolloQueryResult, gql} from "apollo-boost";
+import * as React from 'react';
+import {Query} from "react-apollo";
+import {gql} from "apollo-boost";
 import {queryHandler} from "../common/apolloHelpers";
-
-export enum Role {
-    User = 'user',
-    Admin = 'admin',
-}
-
-interface User
-{
-    _id: string;
-    displayName: string;
-    username: string;
-    roles: Role[];
-}
+import {User} from "../common/consts";
+import {AdminUserTable} from "./AdminUserTable";
 
 const GET_USERS = gql`{
-    users: {
+    users {
         _id,
         displayName,
         username,
@@ -25,8 +14,14 @@ const GET_USERS = gql`{
     }
 }`;
 
-function Admin () {
+interface UserResponse {
+    users: User[]
+}
+
+export default function Admin () {
     return <Query query={GET_USERS}>{
-        queryHandler<User[]>((data: User[]) => <pre>{data}</pre>)
+        queryHandler<UserResponse>((data) => {
+            return <AdminUserTable users={data.users} />
+        })
     }</Query>
 }

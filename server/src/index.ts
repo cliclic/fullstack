@@ -5,11 +5,13 @@ import { PORT } from './modules/common/consts'
 import { createAuthServer } from './authentication/authenticationServer'
 import {mergeSchemas} from "graphql-toolkit";
 import {userSchema} from "./modules/user";
-import * as cors from 'cors';
+import {IncomingMessage} from "http";
 
 const app = express()
 
-app.use(cors())
+app.use(function (req: IncomingMessage, res, next) {
+  next();
+})
 
 const server = new ApolloServer({
   context: ({ req }) => ({
@@ -22,14 +24,8 @@ const server = new ApolloServer({
 createAuthServer(app);
 
 server.applyMiddleware({
-  app,
+  app
 });
-
-app.use(function (req,res, next) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  next();
-});
-
 
 app.listen({ port: PORT });
 console.log(`🚀 Server ready at localhost:${PORT}`);

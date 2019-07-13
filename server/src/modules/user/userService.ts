@@ -16,6 +16,7 @@ export async function count () {
 export async function update(user: UserInstance, fields: Partial<UserInput>) {
     const {roles, displayName, password} = fields;
 
+    console.log ('update roles', roles, fields);
     if (typeof roles !== 'undefined' && Array.isArray(roles)) {
         user.roles = roles;
     }

@@ -9,6 +9,12 @@ import { withCookies, Cookies, ReactCookieProps } from 'react-cookie';
 import {instanceOf} from "prop-types";
 import * as qs from 'qs';
 import {Redirect} from "react-router-dom";
+import {API_PATH, GRAPHQL_PATH} from "../../utils/env";
+
+
+declare global {
+    interface Window { cookies: any; }
+}
 
 export interface AccessToken {
     token: string
@@ -41,7 +47,8 @@ class LoginForm extends React.Component<LoginFormProps, LoginFormState>
     constructor(props: LoginFormProps) {
         super(props);
         this.state = {
-            loggedIn: props.cookies && props.cookies.get('c')
+            // loggedIn: props.cookies && props.cookies.get('authenticated')
+            loggedIn: false
         }
     }
 
@@ -62,10 +69,22 @@ class LoginForm extends React.Component<LoginFormProps, LoginFormState>
                     const {cookies} = this.props;
                     if (cookies) {
                         const expires = new Date(Date.now() + 99999999999999);
-                        cookies.set('c', data.accessToken.token, {
+                        console.log ('set cookie c', data.accessToken.token, {
                             path: '/',
-                            httpOnly: true,
-                            expires
+                            expires,
+                            httpOnly: false
+                        });
+                        cookies.set('c', data.accessToken.token, {
+                            path: GRAPHQL_PATH,
+                            expires,
+                            httpOnly: false,
+                            secure: false
+                        });
+                        cookies.set('c', data.accessToken.token, {
+                            path: API_PATH,
+                            expires,
+                            httpOnly: false,
+                            secure: false
                         });
                         cookies.set('authenticated', 1, {
                             path: '/',
@@ -78,8 +97,14 @@ class LoginForm extends React.Component<LoginFormProps, LoginFormState>
                     const {cookies} = this.props;
                     if (cookies) {
                         cookies.remove('c', {
-                            path: '/',
-                            httpOnly: true,
+                            path: GRAPHQL_PATH,
+                            httpOnly: false,
+                            secure: false
+                        });
+                        cookies.remove('c', {
+                            path: API_PATH,
+                            httpOnly: false,
+                            secure: false
                         });
                         cookies.remove('authenticated', {
                             path: '/',
@@ -94,6 +119,8 @@ class LoginForm extends React.Component<LoginFormProps, LoginFormState>
     {
         const {getFieldDecorator} = this.props.form;
         const {redirect} = qs.parse(window.location.search.slice(1));
+
+        window.cookies = this.props.cookies;
 
         if (this.state.loggedIn) {
             return <Redirect to={redirect} />

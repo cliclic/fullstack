@@ -4,8 +4,7 @@ import { Route, Switch, BrowserRouter } from 'react-router-dom'
 import AuthenticatedRoute from '../Router/AuthenticatedRoute'
 import Login from '../Login'
 import Home from '../Home'
-
-const LoadingMessage = () => <div> "I'm loading..." </div>
+import {LoadingMessage} from "../common/LoadingMessage";
 
 const App: React.FC = () => {
   return (
@@ -16,9 +15,11 @@ const App: React.FC = () => {
             <Login />
           </Suspense>
         </Route>
-        <Suspense fallback={<LoadingMessage />}>
-          <AuthenticatedRoute component={Home} />
-        </Suspense>
+        <AuthenticatedRoute>
+          <Suspense fallback={<LoadingMessage />}>
+            <Home />
+          </Suspense>
+        </AuthenticatedRoute>
       </Switch>
     </BrowserRouter>
   )

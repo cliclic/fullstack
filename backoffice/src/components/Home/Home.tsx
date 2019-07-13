@@ -6,9 +6,14 @@ import { apolloClient } from '../../utils/apollo'
 import {gql} from "apollo-boost";
 import HomeLayout from "./HomeLayout";
 import {queryHandler} from "../common/apolloHelpers";
+import {User} from "../common/consts";
 
 interface HomeState {
     siderCollapsed: boolean
+}
+
+interface MeResponse {
+    me: User
 }
 
 const GET_ME = gql`{
@@ -19,21 +24,13 @@ const GET_ME = gql`{
 }`;
 
 class Home extends React.Component<{}, HomeState> {
-    state = {
-        siderCollapsed: false,
-    };
-
-    onCollapse = (siderCollapsed: boolean) => {
-        this.setState({ siderCollapsed });
-    };
-
     render() {
         return (
             <ApolloProvider client={apolloClient}>
                 <Query query={GET_ME}>
-                    {queryHandler((data) => {
-                        console.log ('me', data);
-                        return <HomeLayout />
+                    {queryHandler<MeResponse>((data, client) => {
+                        apolloClient.writeData({ data });
+                        return <HomeLayout client={client} me={data.me} />
                     })}
                 </Query>
             </ApolloProvider>

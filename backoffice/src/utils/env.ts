@@ -2,7 +2,8 @@ import { Environments } from './types'
 
 interface ENV {
   NODE_ENV: Environments
-  SERVER_URL: string
+  API_PATH: string
+  GRAPHQL_PATH: string
 }
 
 function getEnvVars(env = '', envVars: any): ENV {
@@ -24,4 +25,5 @@ const env = getEnvVars(process.env.NODE_ENV, {
 })
 
 export const NODE_ENV = env.NODE_ENV
-export const SERVER_URL = env.SERVER_URL
+export const API_PATH = env.API_PATH
+export const GRAPHQL_PATH = env.GRAPHQL_PATH
