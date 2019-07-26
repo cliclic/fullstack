@@ -1,0 +1,16 @@
+.Login {
+  .loginCol {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: stretch;
+  }
+
+  .loginCard {
+    flex: 1;
+  }
+
+  form {
+    margin: 0 15px;
+  }
+}

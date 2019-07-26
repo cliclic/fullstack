@@ -1,0 +1,7 @@
+{
+  "PORT": 3006,
+  "DB_NAME": "fullstack",
+  "MONGO_HOST": "",
+  "ADMIN_USER_PASSWORD": "xxxxxxx",
+  "SOCKET_PASSWORD": "xxxxxxx"
+}
