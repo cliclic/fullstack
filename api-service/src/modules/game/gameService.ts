@@ -63,6 +63,8 @@ export async function findGameLotsByPool(poolId: String) {
     return pool.lots;
 }
 
-realTimeService.io.on('new-shot', async function (data: GameShotInput) {
-    createShot(data);
-});
+export function start() {
+    realTimeService.io.on('new-shot', async function (data: GameShotInput) {
+        createShot(data);
+    });
+}

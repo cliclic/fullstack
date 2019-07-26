@@ -2,9 +2,7 @@ import {gql, makeExecutableSchema} from 'apollo-server';
 import resolvers from './UserResolvers';
 
 const typeDefs = gql`
-
-scalar DateTime
-
+    
 enum Role {
     user
     admin
@@ -52,12 +50,9 @@ type Mutation {
     deleteUser(id: ID) : MutationResponse
 }
 
-type MutationResponse {
-    success: Boolean!
-}
 `;
 
-export default makeExecutableSchema({
+export default {
     typeDefs,
     resolvers
-});
+};

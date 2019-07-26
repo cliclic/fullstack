@@ -44,9 +44,15 @@ export interface GameLot
 }
 
 export interface GameLot {
+    _id: string;
     title: string;
     text: string;
     winnerShot?: GameShot;
+}
+
+export interface GameLotPool {
+    _id: string;
+    lots: GameLot[]
 }
 
 export interface GameShot {

@@ -4,6 +4,7 @@ import {Route, Switch} from "react-router";
 import ApolloClient from "apollo-client";
 import {LocalCache, User} from "../common/consts";
 import Admin from "../Admin";
+import GameEditor from "../GameEditor/GameEditor";
 
 const { Header, Content, Footer, Sider } = Layout;
 const { SubMenu } = Menu;
@@ -29,16 +30,21 @@ export default function HomeLayout (props: HomeLayoutProps) {
                     <Icon type="setting" />
                     <span>Administration</span>
                 </Menu.Item>
+                <Menu.Item key="2">
+                    <Icon type="control" />
+                    <span>Gestion des jeux</span>
+                </Menu.Item>
             </Menu>
         </Sider>
         <Layout>
             <Header style={{ background: '#fff', padding: 0 }} />
             <Content style={{ margin: '0 16px' }}>
                 <Switch>
-                    <Route path="/" component={Admin} />
+                    <Route path="/admin" component={Admin} />
+                    <Route path="/" component={GameEditor} />
                 </Switch>
             </Content>
-            <Footer style={{ textAlign: 'center' }}>Ant Design ©2018 Created by Ant UED</Footer>
+            <Footer style={{ textAlign: 'center' }}>©2019 Created by CliCliC</Footer>
         </Layout>
     </Layout>
 }

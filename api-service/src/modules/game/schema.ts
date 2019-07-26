@@ -1,8 +1,7 @@
-import {gql, makeExecutableSchema} from 'apollo-server';
+import {gql} from 'apollo-server';
 import resolvers from './GameResolver';
 
 const typeDefs = gql`
-
 type GameLot {
     _id: ID!
     title: String!
@@ -89,7 +88,7 @@ extend type Mutation {
 }
 `;
 
-export default makeExecutableSchema({
+export default {
     typeDefs,
     resolvers
-});
+};

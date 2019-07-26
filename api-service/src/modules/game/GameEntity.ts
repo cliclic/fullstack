@@ -52,8 +52,8 @@ class GameLot extends Typegoose {
 
 class GameLotPool extends Typegoose {
 
-    @arrayProp({ itemsRef: GameLot })
-    lots: Ref<GameLot>[];
+    @arrayProp({ items: GameLot })
+    lots: GameLot[];
 
 }
 
