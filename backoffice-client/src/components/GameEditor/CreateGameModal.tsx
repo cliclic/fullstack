@@ -25,6 +25,7 @@ export const CreateGameModal: FunctionComponent<CreateGameModalProps> = function
             const formControls: CreateGameFormControls = {};
 
             function submitGame (input: CreateGameInput) {
+                console.log ('create game', input);
                 createGame({variables: {input}});
             }
 

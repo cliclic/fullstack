@@ -1,4 +1,4 @@
-import {Game, GameLot, Role, User} from "./consts";
+import {Game, GameLot, GameTimeSlot, Role, User} from "./consts";
 import {gql} from "apollo-boost";
 
 export const GET_USERS = gql`{
@@ -130,10 +130,9 @@ export interface CreateGameVariables {
 
 export interface CreateGameInput {
     title: string
-    text: string
     startAt: Date
     endAt: Date
-    winningDelay: number
+    timeSlots: GameTimeSlot[]
 }
 
 export interface CreateGameResponse {

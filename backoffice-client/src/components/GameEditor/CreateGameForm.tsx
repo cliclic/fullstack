@@ -4,6 +4,7 @@ import {FormComponentProps, ValidateCallback, ValidationRule} from "antd/es/form
 import {CreateGameInput} from "../common/apolloQueries";
 import diacritics from 'diacritics';
 import {Role} from "../common/consts";
+import {GameTimeSlotsFormItem} from "./GameTimeSlotsFormItem";
 
 const {RangePicker} = DatePicker;
 
@@ -30,21 +31,15 @@ const CreateGameFormBase: FunctionComponent<CreateGameFormProps> = function (pro
     };
 
     function handleSubmit (e?: FormEvent) {
-        console.log ('yo');
         if (e) e.preventDefault();
         form.validateFields(async (err, values) => {
             if (!err) {
-                switch (values.roles)
-                {
-                    case Role.User:
-                        values.roles = [Role.User];
-                    break;
-                    case Role.Admin:
-                        values.roles = [Role.User, Role.Admin];
-                    break;
-                }
-                delete values.confirm;
-                props.onSubmit(values)
+                props.onSubmit({
+                    title: values.title,
+                    startAt: values.startEndAt[0],
+                    endAt: values.startEndAt[1],
+                    timeSlots: []
+                })
             }
         })
     }
@@ -71,6 +66,7 @@ const CreateGameFormBase: FunctionComponent<CreateGameFormProps> = function (pro
                     <RangePicker />
                 )}
             </Form.Item>
+            <GameTimeSlotsFormItem formItemLayout={formItemLayout} form={form} />
             <Button style={{display: 'none'}} type="primary" htmlType="submit" className="login-form-button" />
         </Form>
     )

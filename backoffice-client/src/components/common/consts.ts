@@ -25,7 +25,7 @@ export interface Game
     endAt: Date;
     title: string;
     currentLot: GameLot;
-    winningDelay: Number;
+    timeSlots: GameTimeSlot[];
     createdAt: Date;
     updatedAt: Date;
 }
@@ -70,4 +70,12 @@ export interface GamePlayer {
     firstName: string;
     lasttName: string;
     createdAt: string;
+}
+
+export interface GameTimeSlot {
+    startTime: Number;
+    endTime: Number;
+    data: {
+        winningDelay: number;
+    };
 }

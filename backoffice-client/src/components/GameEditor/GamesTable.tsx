@@ -1,5 +1,6 @@
+import './GamesTable.scss'
 import * as React from 'react';
-import {Button, Table, Tag} from "antd";
+import {Button, Icon, Table, Tag} from "antd";
 import {Game} from "../common/consts";
 import {ApolloQueryResult} from "apollo-client";
 import {DELETE_GAME, DeleteGameResponse, DeleteGameVariables, GetGamesResponse} from "../common/apolloQueries";
@@ -9,11 +10,17 @@ const {Column} = Table;
 
 interface GamesTableProps {
     games: Game[],
+    createGame: () => void,
     reloadGames: () => Promise<ApolloQueryResult<GetGamesResponse>>
 }
 
 export function GamesTable(props: GamesTableProps) {
-    return <Table dataSource={props.games} rowKey="_id">
+
+    const locale = {
+        emptyText: (<div className="no-data" onClick={props.createGame}><Icon type="plus" /><br />Créer un jeu</div>)
+    };
+
+    return <Table className="gamesTable" dataSource={props.games} rowKey="_id" locale={locale}>
         <Column title="Titre" dataIndex="title" />
         <Column title="Description" dataIndex="text" />
         <Column title="Début" dataIndex="startAt" />

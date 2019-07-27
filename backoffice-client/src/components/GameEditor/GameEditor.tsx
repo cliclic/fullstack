@@ -29,7 +29,7 @@ export default function GameEditor () {
                         <Button key="1" onClick={openCreateGameModal}><Icon type="plus" /> Jeu</Button>,
                     ]}
                 />
-                <GamesTable games={data!.games} reloadGames={refetch} />
+                <GamesTable games={data!.games} reloadGames={refetch} createGame={openCreateGameModal} />
                 <CreateGameModal close={closeCreateUserModal} visible={showCreateGameModal} reloadGames={refetch} />
             </React.Fragment>
         })
