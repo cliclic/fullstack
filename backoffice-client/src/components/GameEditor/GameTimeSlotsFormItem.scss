@@ -2,4 +2,23 @@
     .ant-time-picker {
         width: 80px;
     }
+
+    .addTimeSlotContainer {
+        white-space: nowrap;
+    }
+
+    .winningDelayCell {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        .winningDelayText {
+            flex: 1;
+        }
+        .actionButtons {
+            button {
+                padding-right: 5px;
+                padding-left: 5px;
+            }
+        }
+    }
 }

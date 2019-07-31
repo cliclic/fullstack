@@ -2,7 +2,7 @@ import {Modal} from "antd";
 import * as React from "react";
 import {FunctionComponent} from "react";
 import {Mutation} from "react-apollo";
-import {CREATE_USER, CreateGameInput, CreateGameResponse, CreateGameVariables} from "../common/apolloQueries";
+import {CREATE_GAME, CREATE_USER, CreateGameInput, CreateGameResponse, CreateGameVariables} from "../common/apolloQueries";
 import {CreateGameForm, CreateGameFormControls} from "./CreateGameForm";
 
 interface CreateGameModalProps {
@@ -15,7 +15,7 @@ interface CreateGameModalProps {
 export const CreateGameModal: FunctionComponent<CreateGameModalProps> = function (props) {
 
     return <Mutation<CreateGameResponse, CreateGameVariables>
-        mutation={CREATE_USER}
+        mutation={CREATE_GAME}
         update={() => {
             props.reloadGames();
         }}

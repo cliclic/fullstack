@@ -17,13 +17,13 @@ type GameLotPool {
 type Game {
     _id: ID!
     completed: Boolean!
+    title: String!
     startAt: DateTime!
     endAt: DateTime!
-    title: String!
     currentLot: GameLot!
     lotPool: GameLotPool!
-    winningDelay: Int
     createdAt: DateTime!
+    timeSlots: [GameTimeSlot!]!
 }
 
 type GameShot {
@@ -44,11 +44,23 @@ type GamePlayer {
     lastName: String
 }
 
+type GameTimeSlot {
+    startTime: Int!
+    endTime: Int!
+    data: GameTimeSlotData
+}
+
+type GameTimeSlotData {
+    winningDelay: Int!
+}
+
 input CreateGameInput {
     title: String!
-    lotId: ID!
     startAt: DateTime!
     endAt: DateTime!
+    timeSlots: [{
+        startTime: Int!
+    }!]!
 }
 
 input UpdateGameInput {

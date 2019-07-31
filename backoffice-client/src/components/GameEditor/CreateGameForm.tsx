@@ -3,7 +3,7 @@ import {Button, Radio, Form, Icon, Input, DatePicker} from "antd";
 import {FormComponentProps, ValidateCallback, ValidationRule} from "antd/es/form";
 import {CreateGameInput} from "../common/apolloQueries";
 import diacritics from 'diacritics';
-import {Role} from "../common/consts";
+import {GameTimeSlot, Role} from "../common/consts";
 import {GameTimeSlotsFormItem} from "./GameTimeSlotsFormItem";
 
 const {RangePicker} = DatePicker;
@@ -17,9 +17,19 @@ interface CreateGameFormProps extends FormComponentProps {
     formControls?: CreateGameFormControls
 }
 
+const rangeSize = 86400000;
+
 const CreateGameFormBase: FunctionComponent<CreateGameFormProps> = function (props) {
     const {form, formControls} = props;
     const {getFieldDecorator} = form;
+
+    const [timeSlots, setTimeSlots] = useState<GameTimeSlot[]>([{
+        startTime: 0,
+        endTime: rangeSize,
+        data: {
+            winningDelay: 30000
+        }
+    }]);
 
     if (formControls) {
         formControls.submit = handleSubmit;
@@ -34,14 +44,24 @@ const CreateGameFormBase: FunctionComponent<CreateGameFormProps> = function (pro
         if (e) e.preventDefault();
         form.validateFields(async (err, values) => {
             if (!err) {
+                console.log({
+                    title: values.title,
+                    startAt: values.startEndAt[0],
+                    endAt: values.startEndAt[1],
+                    timeSlots
+                });
                 props.onSubmit({
                     title: values.title,
                     startAt: values.startEndAt[0],
                     endAt: values.startEndAt[1],
-                    timeSlots: []
+                    timeSlots
                 })
             }
         })
+    }
+
+    function onTimeSlotsChange(newTimeSlots: GameTimeSlot[]) {
+        setTimeSlots(newTimeSlots);
     }
 
     return (
@@ -66,7 +86,7 @@ const CreateGameFormBase: FunctionComponent<CreateGameFormProps> = function (pro
                     <RangePicker />
                 )}
             </Form.Item>
-            <GameTimeSlotsFormItem formItemLayout={formItemLayout} form={form} />
+            <GameTimeSlotsFormItem formItemLayout={formItemLayout} form={form} onChange={onTimeSlotsChange} value={timeSlots} rangeSize={rangeSize} />
             <Button style={{display: 'none'}} type="primary" htmlType="submit" className="login-form-button" />
         </Form>
     )
