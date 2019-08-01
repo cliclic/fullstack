@@ -18,7 +18,7 @@ export function AdminUserTable(props: AdminUserTableProps) {
         <Column title="Nom" dataIndex="displayName" />
         <Column title="Login" dataIndex="username" />
         <Column title="Roles" dataIndex="roles" render={renderRolesCell}/>
-        <Column title="Actions" render={ActionsCell}/>
+        <Column title="Actions" render={ActionsCell} width={250} />
     </Table>
 }
 
@@ -40,7 +40,7 @@ function ActionsCell (_: undefined, user: User) {
                         await deleteUser({variables: {id: user._id}});
 
                     }
-                    return <Button type="danger" onClick={onDeleteClicked}>Supprimer</Button>;
+                    return <Button type="danger" shape="circle" size="small" icon="delete" onClick={onDeleteClicked}></Button>;
                 }
             }
             </Mutation>

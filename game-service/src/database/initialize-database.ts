@@ -1,7 +1,8 @@
 import { Connection } from 'mongoose'
-import { UserModel } from '../../../api-service/src/modules/user'
-import { ADMIN_USER_PASSWORD } from '../../../api-service/src/modules/common/consts'
+import { UserModel } from '../../../api-service/src/modules/user/UserEntity'
+import { ADMIN_USER_PASSWORD } from '../common/consts'
 import { passwordEncode } from '../../../api-service/src/modules/common/helpers'
+import { GameLotPoolModel } from "../../../api-service/src/modules/game/GameEntity";
 
 export default async function initializeDatabase(db: Connection) {
   const usersCount = await UserModel.countDocuments()
@@ -15,5 +16,9 @@ export default async function initializeDatabase(db: Connection) {
     });
 
     adminUser.save();
+  }
+  const lotPool = await GameLotPoolModel.findOne({});
+  if (!lotPool) {
+    await GameLotPoolModel.create({});
   }
 }

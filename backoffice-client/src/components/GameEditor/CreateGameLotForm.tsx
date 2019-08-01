@@ -1,25 +1,25 @@
 import React, {FormEvent, FocusEvent, FunctionComponent, useState} from "react";
 import {Button, Radio, Form, Icon, Input, DatePicker} from "antd";
 import {FormComponentProps, ValidateCallback, ValidationRule} from "antd/es/form";
-import {CreateGameInput} from "../common/apolloQueries";
+import {CreateGameLotInput} from "../common/apolloQueries";
 import diacritics from 'diacritics';
 import {GameTimeSlot, Role} from "../common/consts";
 import {GameTimeSlotsFormItem} from "./GameTimeSlotsFormItem";
 
 const {RangePicker} = DatePicker;
 
-export interface CreateGameFormControls {
+export interface CreateGameLotFormControls {
     submit?: () => void;
 }
 
-interface CreateGameFormProps extends FormComponentProps {
-    onSubmit(values: CreateGameInput): void,
-    formControls?: CreateGameFormControls
+interface CreateGameLotFormProps extends FormComponentProps {
+    onSubmit(values: CreateGameLotInput): void,
+    formControls?: CreateGameLotFormControls
 }
 
 const rangeSize = 86400000;
 
-const CreateGameFormBase: FunctionComponent<CreateGameFormProps> = function (props) {
+const CreateGameLotFormBase: FunctionComponent<CreateGameLotFormProps> = function (props) {
     const {form, formControls} = props;
     const {getFieldDecorator} = form;
 
@@ -44,24 +44,12 @@ const CreateGameFormBase: FunctionComponent<CreateGameFormProps> = function (pro
         if (e) e.preventDefault();
         form.validateFields(async (err, values) => {
             if (!err) {
-                console.log({
-                    title: values.title,
-                    startAt: values.startEndAt[0].startOf('day'),
-                    endAt: values.startEndAt[1].endOf('day'),
-                    timeSlots
-                });
                 props.onSubmit({
                     title: values.title,
-                    startAt: values.startEndAt[0].startOf('day'),
-                    endAt: values.startEndAt[1].endOf('day'),
-                    timeSlots
+                    text: values.text ? values.text : values.title + ' à gagner !',
                 })
             }
         })
-    }
-
-    function onTimeSlotsChange(newTimeSlots: GameTimeSlot[]) {
-        setTimeSlots(newTimeSlots);
     }
 
     return (
@@ -71,30 +59,22 @@ const CreateGameFormBase: FunctionComponent<CreateGameFormProps> = function (pro
                 {...formItemLayout}
             >
                 {getFieldDecorator('title', {
-                    rules: [{required: true, message: 'Veuillez renseigner un nom'}]
+                    rules: [{required: true, message: 'Veuillez renseigner un titre'}]
                 })(
                     <Input />
                 )}
             </Form.Item>
             <Form.Item
-                label="Début - Fin"
+                label="Texte"
                 {...formItemLayout}
             >
-                {getFieldDecorator('startEndAt', {
-                    rules: [{required: true, message: 'Veuillez renseigner une date de début'}]
-                })(
-                    <RangePicker />
+                {getFieldDecorator('text')(
+                    <Input placeholder={form.getFieldValue('title') ? form.getFieldValue('title') + ' à gagner !' : ''} />
                 )}
             </Form.Item>
-            <GameTimeSlotsFormItem formItemLayout={formItemLayout} form={form} onChange={onTimeSlotsChange} value={timeSlots} rangeSize={rangeSize} />
             <Button style={{display: 'none'}} type="primary" htmlType="submit" className="login-form-button" />
         </Form>
     )
 }
 
-export const CreateGameForm = Form.create<CreateGameFormProps>({onFieldsChange(props, changedFields, allFields) {
-    const {displayName} = changedFields;
-    if (displayName) {
-        props.form.setFieldsValue({gamename: displayName.value});
-    }
-}})(CreateGameFormBase);
+export const CreateGameLotForm = Form.create<CreateGameLotFormProps>()(CreateGameLotFormBase);

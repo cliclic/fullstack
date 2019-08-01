@@ -12,8 +12,9 @@ async function queryGameResolver(_, fields) {
     return await gameService.findById(fields.id);
 }
 
-async function queryLotsResolver(_, fields) {
-    return await gameService.findGameLotsByPool(fields.poolId);
+async function queryLotsResolver(args) {
+    let id = args ? args.id : null;
+    return await gameService.findOneGameLotPool(id ? {_id: id} : {});
 }
 
 async function createGameResolver(_, fields) {
@@ -55,15 +56,30 @@ async function createGameLotResolver(_, fields) {
     }
 }
 
+async function moveGameLotResolver(_, fields) {
+    return {
+        success: await gameService.moveGameLot(fields.poolId, fields.id, fields.direction),
+        __typename: "MutationResponse"
+    };
+}
+
+async function deleteGameLotResolver(_, fields) {
+    return {
+        success: await gameService.deleteGameLot(fields.poolId, fields.id),
+    };
+}
+
 export default {
     Query: {
         game: combineResolvers(requiresRole(Role.User), queryGameResolver),
         games: combineResolvers(requiresRole(Role.User), queryGamesResolver),
-        lots: combineResolvers(requiresRole(Role.User), queryLotsResolver),
+        lotPool: combineResolvers(requiresRole(Role.User), queryLotsResolver),
     },
     Mutation: {
-        createGameLot: combineResolvers(requiresRole(Role.User), createGameLotResolver),
         createGame: combineResolvers(requiresRole(Role.User), createGameResolver),
         updateGame: combineResolvers(requiresRole(Role.User), updateGameResolver),
+        createGameLot: combineResolvers(requiresRole(Role.User), createGameLotResolver),
+        deleteGameLot: combineResolvers(requiresRole(Role.User), deleteGameLotResolver),
+        moveGameLot: combineResolvers(requiresRole(Role.User), moveGameLotResolver),
     },
 }

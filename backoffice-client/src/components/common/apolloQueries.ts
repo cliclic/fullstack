@@ -1,4 +1,4 @@
-import {Game, GameLot, GameTimeSlot, Role, User} from "./consts";
+import {Game, GameLot, GameLotPool, GameTimeSlot, Role, User} from "./consts";
 import {gql} from "apollo-boost";
 
 export const GET_USERS = gql`{
@@ -94,14 +94,34 @@ export interface CreateUserResponse {
 
 /** ******** GAMES ******** **/
 
-export const GET_GAMES = gql`{
+export const GET_GAMES_AND_LOTS = gql`{
+    lotPool {
+        _id,
+        lots {
+            _id,
+            title,
+            text,
+            winnerShot{
+                _id,
+                player{
+                    _id,
+                    originalId,
+                    avatar,
+                    fullName,
+                    firstName,
+                    lastName
+                },
+                message,
+                createdAt
+            }
+        }
+    },
     games {
         _id,
         completed,
         title,
         startAt,
         endAt,
-        winningDelay,
         createdAt,
         currentLot {
             _id,
@@ -139,8 +159,10 @@ export interface CreateGameResponse {
     _id: string
 }
 
-export interface GetGamesResponse {
-    games: Game[]
+export interface GetGamesAndLotsResponse {
+    games: Game[];
+    lotPool: GameLotPool;
+    lotPoolId: string;
 }
 
 export const DELETE_GAME = gql`
@@ -202,4 +224,25 @@ export interface DeleteGameLotVariables {
 
 export interface DeleteGameLotResponse {
     success: boolean;
+}
+
+export interface MoveGameLotVariables {
+    poolId: string;
+    id: string;
+    direction: string;
+}
+
+export const MOVE_GAME_LOT = gql`
+    mutation MoveGameLot($poolId: ID, $id: ID, $direction: String) {
+        moveGameLot(poolId: $poolId, id: $id, direction: $direction) {
+            success
+        }
+    }
+`
+
+export interface MoveGameLotResponse {
+    moveGameLot: {
+        success: boolean;
+        __typename: string;
+    };
 }

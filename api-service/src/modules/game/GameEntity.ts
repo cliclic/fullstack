@@ -1,6 +1,7 @@
 import {prop, Typegoose, InstanceType, Ref, arrayProp, pre} from 'typegoose'
 import {Schema} from "mongoose";
 import ObjectId = Schema.Types.ObjectId;
+import {GameTimeSlot} from "./consts";
 
 class GamePlayer extends Typegoose {
     @prop({ required: true, unique: true, index: true })
@@ -40,6 +41,9 @@ class GameShot extends Typegoose {
 }
 
 class GameLot extends Typegoose {
+
+    _id: ObjectId
+
     @prop({ required: true })
     title: string
 
@@ -56,6 +60,14 @@ class GameLotPool extends Typegoose {
     lots: GameLot[];
 
 }
+
+const GameTimeSlotSchema = new Schema({
+    startTime: Number,
+    endTime: Number,
+    data: {
+        winningDelay: Number,
+    }
+});
 
 @pre<Game>('save', async function() {
     if (!this.lotPool) {
@@ -89,7 +101,7 @@ class Game extends Typegoose {
     lotPool: Ref<InstanceType<GameLotPool>>
 
     @prop({ required: true })
-    winningDelay: number;
+    timeSlots: [GameTimeSlot];
 
     @prop()
     createdAt: Date
@@ -106,7 +118,9 @@ export const GameLotPoolModel = new GameLotPool().getModelForClass(GameLotPool);
 
 export type GameLotPoolInstance = InstanceType<GameLotPool>;
 
-export const GameModel = new Game().getModelForClass(Game);
+export const GameModel = new Game().getModelForClass(Game, {
+    schemaOptions: { timestamps: true },
+});
 
 export type GameInstance = InstanceType<Game>;
 

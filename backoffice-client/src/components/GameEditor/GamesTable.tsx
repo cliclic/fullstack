@@ -1,26 +1,29 @@
 import './GamesTable.scss'
 import * as React from 'react';
-import {Button, Icon, Table, Tag} from "antd";
+import {Button, Icon, Table} from "antd";
 import {Game} from "../common/consts";
 import {ApolloQueryResult} from "apollo-client";
-import {DELETE_GAME, DeleteGameResponse, DeleteGameVariables, GetGamesResponse} from "../common/apolloQueries";
-import {Mutation} from "react-apollo";
+import {DELETE_GAME, DeleteGameResponse, DeleteGameVariables, GetGamesAndLotsResponse} from "../common/apolloQueries";
+import {Mutation, QueryResult} from "react-apollo";
 
 const {Column} = Table;
 
 interface GamesTableProps {
-    games: Game[],
+    result: QueryResult<GetGamesAndLotsResponse>,
     createGame: () => void,
-    reloadGames: () => Promise<ApolloQueryResult<GetGamesResponse>>
+    reloadGames: () => Promise<ApolloQueryResult<GetGamesAndLotsResponse>>
 }
 
 export function GamesTable(props: GamesTableProps) {
+    const {result} = props;
+    const {data, loading} = result;
+    const games = data && data.games ? data.games : [];
 
     const locale = {
         emptyText: (<div className="no-data" onClick={props.createGame}><Icon type="plus" /><br />Créer un jeu</div>)
     };
 
-    return <Table className="gamesTable" dataSource={props.games} rowKey="_id" locale={locale}>
+    return <Table className="gamesTable" loading={loading} dataSource={games} rowKey="_id" locale={locale}>
         <Column title="Titre" dataIndex="title" />
         <Column title="Description" dataIndex="text" />
         <Column title="Début" dataIndex="startAt" />
@@ -38,7 +41,7 @@ function ActionsCell (_: undefined, game: Game) {
                 async function onDeleteClicked() {
                     await deleteGame({variables: {id: game._id}});
                 }
-                return <Button type="danger" onClick={onDeleteClicked}>Supprimer</Button>;
+                return <Button icon="delete" shape="circle" type="danger" size="small" onClick={onDeleteClicked}></Button>;
             }
         }
         </Mutation>

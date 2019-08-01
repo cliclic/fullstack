@@ -19,6 +19,7 @@ export const CreateUserModal: FunctionComponent<CreateUserModalProps> = function
         update={() => {
             props.reloadUsers();
         }}
+        onCompleted={props.close}
     >{
         (createUser) => {
 

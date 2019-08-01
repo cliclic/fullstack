@@ -22,9 +22,9 @@ export default function Admin () {
         queryHandler<GetUsersResponse>(({data, refetch}) => {
             return <React.Fragment>
                     <PageHeader
-                    onBack={() => window.history.back()}
                     title="Administration"
                     subTitle="Utilisateurs"
+                    backIcon={false}
                     extra={[
                         <Button key="1" onClick={openCreateUserModal}><Icon type="plus" /> Utilisateur</Button>,
                     ]}

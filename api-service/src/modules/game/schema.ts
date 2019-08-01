@@ -20,7 +20,7 @@ type Game {
     title: String!
     startAt: DateTime!
     endAt: DateTime!
-    currentLot: GameLot!
+    currentLot: GameLot
     lotPool: GameLotPool!
     createdAt: DateTime!
     timeSlots: [GameTimeSlot!]!
@@ -58,9 +58,17 @@ input CreateGameInput {
     title: String!
     startAt: DateTime!
     endAt: DateTime!
-    timeSlots: [{
-        startTime: Int!
-    }!]!
+    timeSlots: [GameTimeSlotInput!]!
+}
+
+input GameTimeSlotInput {
+    startTime: Int!
+    endTime: Int!
+    data: GameTimeSlotDataInput
+}
+
+input GameTimeSlotDataInput {
+    winningDelay: Int!
 }
 
 input UpdateGameInput {
@@ -88,15 +96,18 @@ input CreateGameShotInput {
 
 extend type Query {
     games: [Game!]!
-    lots: [GameLot!]!
+    lotPool(id: ID): GameLotPool
     game(id: ID): Game!
 }
 
 extend type Mutation {
-    createGameLot(poolId: ID, input: CreateGameLotInput): GameLot
     createGame(input: CreateGameInput) : Game
     updateGame(id: ID, input: UpdateGameInput) : Game
     deleteGame(id: ID) : MutationResponse
+    createGameLot(poolId: ID, input: CreateGameLotInput): GameLot
+    updateGameLot(poolId: ID, id: ID, input: UpdateGameLotInput) : Game
+    deleteGameLot(poolId: ID, id: ID) : MutationResponse
+    moveGameLot(poolId: ID, id: ID, direction: String) : MutationResponse
 }
 `;
 

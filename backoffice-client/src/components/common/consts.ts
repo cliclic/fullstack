@@ -73,8 +73,8 @@ export interface GamePlayer {
 }
 
 export interface GameTimeSlot {
-    startTime: Number;
-    endTime: Number;
+    startTime: number;
+    endTime: number;
     data: {
         winningDelay: number;
     };

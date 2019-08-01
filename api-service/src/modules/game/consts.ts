@@ -1,3 +1,4 @@
+
 export interface GameShotInput {
   message: string;
   gameId: string;
@@ -23,3 +24,10 @@ export interface GameInput {
   title: string;
 }
 
+export interface GameTimeSlot {
+  startTime: number;
+  endTime: number;
+  data: {
+    winningDelay: number;
+  };
+}

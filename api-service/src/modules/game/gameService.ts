@@ -58,9 +58,41 @@ export async function findLotPoolById(id) {
     return await GameLotPoolModel.findById(id);
 }
 
-export async function findGameLotsByPool(poolId: String) {
-    const pool = await GameLotPoolModel.findById(poolId).populate('lots');
-    return pool.lots;
+export async function findOneGameLotPool(search) {
+    const pool = await GameLotPoolModel.findOne(search);
+    return pool;
+}
+
+export async function moveGameLot(poolId, id, direction) {
+    const pool = await findOneGameLotPool({});
+    const index = pool.lots.findIndex(lot => lot._id.toString() === id);
+    if (index > -1) {
+        if (direction === "down") {
+            if (index < pool.lots.length - 1) {
+                pool.lots.splice(index + 1, 0, pool.lots.splice(index, 1)[0]);
+                await pool.save();
+                return true;
+            }
+        } else {
+            if (index > 0) {
+                pool.lots.splice(index - 1, 0, pool.lots.splice(index, 1)[0]);
+                await pool.save();
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+export async function deleteGameLot(poolId, id) {
+    const pool = await findOneGameLotPool({});
+    const index = pool.lots.findIndex(lot => lot._id.toString() === id);
+    if (index > -1) {
+        pool.lots.splice(index, 1);
+        await pool.save();
+        return true;
+    }
+    return false;
 }
 
 export function start() {
