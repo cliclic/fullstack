@@ -123,6 +123,13 @@ export const GET_GAMES_AND_LOTS = gql`{
         startAt,
         endAt,
         createdAt,
+        timeSlots {
+            startTime,
+            endTime,
+            data {
+                winningDelay
+            }
+        },
         currentLot {
             _id,
             title,
@@ -136,26 +143,27 @@ export const GET_GAMES_AND_LOTS = gql`{
     }
 }`;
 
-export const CREATE_GAME = gql`
-    mutation CreateGame($input: CreateGameInput) {
-        createGame(input: $input) {
+export const UPDATE_GAME = gql`
+    mutation UpdateGame($input: UpdateGameInput) {
+        updateGame(input: $input) {
             _id
         }
     }
 `
 
-export interface CreateGameVariables {
-    input: CreateGameInput
+export interface UpdateGameVariables {
+    input: UpdateGameInput
 }
 
-export interface CreateGameInput {
+export interface UpdateGameInput {
+    _id?: string
     title: string
     startAt: Date
     endAt: Date
     timeSlots: GameTimeSlot[]
 }
 
-export interface CreateGameResponse {
+export interface UpdateGameResponse {
     _id: string
 }
 
@@ -183,25 +191,26 @@ export interface DeleteGameResponse {
 
 /** ******** GAME LOTS ******** **/
 
-export const CREATE_GAME_LOT = gql`
-    mutation CreateGameLot($poolId: ID, $input: CreateGameLotInput) {
-        createGameLot(poolId: $poolId, input: $input) {
+export const UPDATE_GAME_LOT = gql`
+    mutation UpdateGameLot($poolId: ID, $input: UpdateGameLotInput) {
+        updateGameLot(poolId: $poolId, input: $input) {
             _id
         }
     }
 `
 
-export interface CreateGameLotVariables {
+export interface UpdateGameLotVariables {
     poolId: string;
-    input: CreateGameLotInput;
+    input: UpdateGameLotInput;
 }
 
-export interface CreateGameLotInput {
+export interface UpdateGameLotInput {
+    _id?: string
     title: string
     text: string
 }
 
-export interface CreateGameLotResponse {
+export interface UpdateGameLotResponse {
     _id: string
 }
 

@@ -3,7 +3,7 @@ import {Query} from "react-apollo";
 import {queryHandler} from "../common/apolloHelpers";
 import {AdminUserTable} from "./AdminUserTable";
 import {GET_USERS, GetUsersResponse} from "../common/apolloQueries";
-import {Button, Icon, Modal, PageHeader} from "antd";
+import {Button, Icon, PageHeader} from "antd";
 import {useState} from "react";
 import {CreateUserModal} from "./CreateUserModal";
 
@@ -26,7 +26,7 @@ export default function Admin () {
                     subTitle="Utilisateurs"
                     backIcon={false}
                     extra={[
-                        <Button key="1" onClick={openCreateUserModal}><Icon type="plus" /> Utilisateur</Button>,
+                        <Button key="1" onClick={openCreateUserModal} type="primary"><Icon type="plus" /> Utilisateur</Button>,
                     ]}
                 />
                 <AdminUserTable users={data!.users} reloadUsers={refetch} />

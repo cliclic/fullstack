@@ -38,6 +38,9 @@ export const CreateUserModal: FunctionComponent<CreateUserModalProps> = function
                 visible={props.visible}
                 onOk={handleOk}
                 onCancel={props.close}
+                destroyOnClose={true}
+                cancelText="Annuler"
+                okText="Enregistrer"
             >
                 <CreateUserForm onSubmit={submitUser} formControls={formControls} />
             </Modal>

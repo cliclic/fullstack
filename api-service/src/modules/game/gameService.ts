@@ -22,12 +22,8 @@ export async function createGame(fields: GameInput) {
     return game;
 }
 
-export async function createGameLot(pool: GameLotPoolInstance, fields: GameLotInput) {
-    const lot = await GameLotModel.create(fields);
-    await lot.save();
-    pool.lots.push(lot);
-    await pool.save();
-    return lot;
+export async function updateGame(gameId: string, fields: GameInput) {
+    return await GameModel.findByIdAndUpdate(gameId, fields, {runValidators: true});
 }
 
 export async function createShot(input: GameShotInput) {
@@ -44,6 +40,26 @@ export async function createShot(input: GameShotInput) {
         timestamp: Date.now()
     });
     return gameShot;
+}
+
+
+export async function createGameLot(pool: GameLotPoolInstance, fields: GameLotInput) {
+    const lot = await GameLotModel.create(fields);
+    await lot.save();
+    pool.lots.push(lot);
+    await pool.save();
+    return lot;
+}
+
+export async function updateGameLot(pool: GameLotPoolInstance, lotId: string, fields: GameLotInput) {
+    const lot = pool.lots.find(lot => lot._id.toString() === lotId);
+    for (const i in fields) {
+        if (i === '_id') continue;
+        lot[i] = fields[i];
+    }
+    pool.markModified('lots');
+    await pool.save();
+    return lot;
 }
 
 export async function find(search) {

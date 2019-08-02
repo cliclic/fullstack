@@ -17,30 +17,20 @@ async function queryLotsResolver(args) {
     return await gameService.findOneGameLotPool(id ? {_id: id} : {});
 }
 
-async function createGameResolver(_, fields) {
+async function updateGameResolver(_, fields) {
     try {
-        return await gameService.createGame(fields.input)
+        if (fields.input._id) {
+            return await gameService.updateGame(fields.input._id, fields.input);
+        } else {
+            return await gameService.createGame(fields.input);
+        }
     } catch (e) {
         console.error (e);
-        throw new UserInputError('Cannot create User', { invalidArgs: Object.keys(fields) })
-    }
-}
-
-async function updateGameResolver(_, fields) {
-    let user
-    try {
-        user = await gameService.findById(fields.id)
-    } catch (e) {
-        throw new UserInputError('Unknown Game', { invalidArgs: ['id'] })
-    }
-    try {
-        return await gameService.update(user, fields.input)
-    } catch (e) {
         throw new UserInputError('Cannot update Game', { invalidArgs: Object.keys(fields) })
     }
 }
 
-async function createGameLotResolver(_, fields) {
+async function updateGameLotResolver(_, fields) {
     let lotPool;
     try {
         lotPool = await gameService.findLotPoolById(fields.poolId);
@@ -49,7 +39,11 @@ async function createGameLotResolver(_, fields) {
         throw new UserInputError('Cannot find pool', { invalidArgs: ['poolId'] })
     }
     try {
-        return await gameService.createGameLot(lotPool, fields.input);
+        if (fields.input._id) {
+            return await gameService.updateGameLot(lotPool, fields.input._id, fields.input);
+        } else {
+            return await gameService.createGameLot(lotPool, fields.input);
+        }
     } catch (e) {
         console.error (e);
         throw new UserInputError('Cannot create GameLot', { invalidArgs: ['input'] })
@@ -76,9 +70,8 @@ export default {
         lotPool: combineResolvers(requiresRole(Role.User), queryLotsResolver),
     },
     Mutation: {
-        createGame: combineResolvers(requiresRole(Role.User), createGameResolver),
         updateGame: combineResolvers(requiresRole(Role.User), updateGameResolver),
-        createGameLot: combineResolvers(requiresRole(Role.User), createGameLotResolver),
+        updateGameLot: combineResolvers(requiresRole(Role.User), updateGameLotResolver),
         deleteGameLot: combineResolvers(requiresRole(Role.User), deleteGameLotResolver),
         moveGameLot: combineResolvers(requiresRole(Role.User), moveGameLotResolver),
     },

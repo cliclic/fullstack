@@ -14,7 +14,7 @@ interface AdminUserTableProps {
 }
 
 export function AdminUserTable(props: AdminUserTableProps) {
-    return <Table dataSource={props.users} rowKey="_id">
+    return <Table dataSource={props.users} rowKey="_id" size="small" pagination={false}>
         <Column title="Nom" dataIndex="displayName" />
         <Column title="Login" dataIndex="username" />
         <Column title="Roles" dataIndex="roles" render={renderRolesCell}/>
@@ -40,7 +40,7 @@ function ActionsCell (_: undefined, user: User) {
                         await deleteUser({variables: {id: user._id}});
 
                     }
-                    return <Button type="danger" shape="circle" size="small" icon="delete" onClick={onDeleteClicked}></Button>;
+                    return <Button type="danger" shape="circle" size="small" icon="delete" onClick={onDeleteClicked} />;
                 }
             }
             </Mutation>

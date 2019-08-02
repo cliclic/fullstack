@@ -36,7 +36,7 @@ export const GET_LOT = gql`{
 
 interface GameLotsTableProps {
     result: QueryResult<GetGamesAndLotsResponse>,
-    createLot: () => void,
+    editLot: (gameLot?: GameLot) => void,
     reloadGameLots: () => Promise<ApolloQueryResult<GetGamesAndLotsResponse>>
 }
 
@@ -52,7 +52,7 @@ export function GameLotsTable(props: GameLotsTableProps) {
     const poolId = data && data.lotPool ? data.lotPool._id : '';
 
     const locale = {
-        emptyText: (<div className="no-data" onClick={props.createLot}><Icon type="plus" /><br />Ajouter un lot</div>)
+        emptyText: (<div className="no-data" onClick={() => props.editLot()}><Icon type="plus" /><br />Ajouter un lot</div>)
     };
 
     function ActionsCell (_: undefined, gameLot: GameLot, index: number) {
@@ -79,10 +79,9 @@ export function GameLotsTable(props: GameLotsTableProps) {
             >{
                 (moveUpGameLot) => {
                     async function onClicked() {
-                        console.log (gameLot);
                         await moveUpGameLot({variables: {poolId, id: gameLot._id, direction: 'up'}});
                     }
-                    return <Button disabled={index === 0} type="link" icon="arrow-up" onClick={onClicked}></Button>;
+                    return <Button disabled={index === 0} type="link" icon="arrow-up" onClick={onClicked} />;
                 }
             }
         </Mutation>
@@ -111,10 +110,12 @@ export function GameLotsTable(props: GameLotsTableProps) {
                         console.log (gameLot);
                         await moveUpGameLot({variables: {poolId, id: gameLot._id, direction: 'down'}});
                     }
-                    return <Button disabled={index === lots.length - 1} type="link" icon="arrow-down" onClick={onClicked}></Button>;
+                    return <Button disabled={index === lots.length - 1} type="link" icon="arrow-down" onClick={onClicked} />;
                 }
             }
         </Mutation>
+        <Divider type="vertical" />
+        <Button size="small" icon="edit" shape="circle" type="primary" onClick={() => props.editLot(gameLot)} />
         <Divider type="vertical" />
         <Mutation<DeleteGameLotResponse, DeleteGameLotVariables>
             mutation={DELETE_GAME_LOT}
@@ -133,7 +134,7 @@ export function GameLotsTable(props: GameLotsTableProps) {
                         okType="danger"
                         icon={<Icon type="delete" />}
                     >
-                    <Button size="small" icon="delete" shape="circle" type="danger"></Button>
+                    <Button size="small" icon="delete" shape="circle" type="danger" />
                 </Popconfirm>
             }
         }

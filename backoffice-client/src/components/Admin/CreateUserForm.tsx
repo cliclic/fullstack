@@ -1,6 +1,6 @@
 import React, {FormEvent, FocusEvent, FunctionComponent, useState} from "react";
-import {Button, Radio, Form, Icon, Input} from "antd";
-import {FormComponentProps, ValidateCallback, ValidationRule} from "antd/es/form";
+import {Button, Radio, Form, Input} from "antd";
+import {FormComponentProps, ValidationRule} from "antd/es/form";
 import {CreateUserInput} from "../common/apolloQueries";
 import diacritics from 'diacritics';
 import {Role} from "../common/consts";

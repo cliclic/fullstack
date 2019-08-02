@@ -1,35 +1,22 @@
-import React, {FormEvent, FocusEvent, FunctionComponent, useState} from "react";
-import {Button, Radio, Form, Icon, Input, DatePicker} from "antd";
-import {FormComponentProps, ValidateCallback, ValidationRule} from "antd/es/form";
-import {CreateGameLotInput} from "../common/apolloQueries";
-import diacritics from 'diacritics';
-import {GameTimeSlot, Role} from "../common/consts";
-import {GameTimeSlotsFormItem} from "./GameTimeSlotsFormItem";
+import React, {FormEvent, FunctionComponent} from "react";
+import {Button, Form, Input} from "antd";
+import {FormComponentProps} from "antd/es/form";
+import {UpdateGameLotInput} from "../common/apolloQueries";
+import {GameLot} from "../common/consts";
 
-const {RangePicker} = DatePicker;
-
-export interface CreateGameLotFormControls {
+export interface GameLotEditorFormControls {
     submit?: () => void;
 }
 
-interface CreateGameLotFormProps extends FormComponentProps {
-    onSubmit(values: CreateGameLotInput): void,
-    formControls?: CreateGameLotFormControls
+interface GameLotEditorFormProps extends FormComponentProps {
+    onSubmit(values: UpdateGameLotInput): void,
+    formControls?: GameLotEditorFormControls
+    editedLot?: GameLot;
 }
 
-const rangeSize = 86400000;
-
-const CreateGameLotFormBase: FunctionComponent<CreateGameLotFormProps> = function (props) {
+const GameLotEditorFormBase: FunctionComponent<GameLotEditorFormProps> = function (props) {
     const {form, formControls} = props;
     const {getFieldDecorator} = form;
-
-    const [timeSlots, setTimeSlots] = useState<GameTimeSlot[]>([{
-        startTime: 0,
-        endTime: rangeSize,
-        data: {
-            winningDelay: 30000
-        }
-    }]);
 
     if (formControls) {
         formControls.submit = handleSubmit;
@@ -52,6 +39,8 @@ const CreateGameLotFormBase: FunctionComponent<CreateGameLotFormProps> = functio
         })
     }
 
+    const {editedLot} = props;
+
     return (
         <Form onSubmit={handleSubmit} className="create-game-form tight" layout="horizontal">
             <Form.Item
@@ -59,7 +48,8 @@ const CreateGameLotFormBase: FunctionComponent<CreateGameLotFormProps> = functio
                 {...formItemLayout}
             >
                 {getFieldDecorator('title', {
-                    rules: [{required: true, message: 'Veuillez renseigner un titre'}]
+                    rules: [{required: true, message: 'Veuillez renseigner un titre'}],
+                    initialValue: editedLot ? editedLot.title : undefined
                 })(
                     <Input />
                 )}
@@ -68,7 +58,9 @@ const CreateGameLotFormBase: FunctionComponent<CreateGameLotFormProps> = functio
                 label="Texte"
                 {...formItemLayout}
             >
-                {getFieldDecorator('text')(
+                {getFieldDecorator('text', {
+                    initialValue: editedLot ? editedLot.text: undefined
+                })(
                     <Input placeholder={form.getFieldValue('title') ? form.getFieldValue('title') + ' à gagner !' : ''} />
                 )}
             </Form.Item>
@@ -77,4 +69,4 @@ const CreateGameLotFormBase: FunctionComponent<CreateGameLotFormProps> = functio
     )
 }
 
-export const CreateGameLotForm = Form.create<CreateGameLotFormProps>()(CreateGameLotFormBase);
+export const GameLotEditorForm = Form.create<GameLotEditorFormProps>()(GameLotEditorFormBase);

@@ -1,22 +1,12 @@
 import "./GameTimeSlotsFormItem.scss";
-import React, {FormEvent, FocusEvent, FunctionComponent, useState, Fragment, useEffect} from "react";
-import {Button, Radio, Form, Icon, Input, DatePicker, Table, TimePicker} from "antd";
-import {FormComponentProps, ValidateCallback, ValidationRule} from "antd/es/form";
-import {CreateGameInput} from "../common/apolloQueries";
-import {Game, GameTimeSlot} from "../common/consts";
+import React, {FunctionComponent, useState, useEffect} from "react";
+import {Button, Form, Table, TimePicker} from "antd";
+import {FormComponentProps} from "antd/es/form";
+import {GameTimeSlot} from "../common/consts";
 import "moment-duration-format";
-import moment, {DurationFormatSettings, Moment} from "moment";
+import moment, {Moment} from "moment";
 import Column from "antd/lib/table/Column";
 import {cloneDeep} from "lodash";
-
-type ScaleGrid = ScaleSlot[];
-
-export interface ScaleSlot {
-    label: string,
-    style: {
-        width: string
-    }
-}
 
 interface GameTimeSlotsFormItemProps extends FormComponentProps {
     formItemLayout: any;

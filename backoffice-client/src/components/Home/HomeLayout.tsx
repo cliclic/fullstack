@@ -1,4 +1,4 @@
-import { Layout, Menu, Breadcrumb, Icon } from 'antd';
+import { Layout, Menu, Icon } from 'antd';
 import React, {useState, Suspense} from "react";
 import {Route, RouteComponentProps, Switch, withRouter} from "react-router";
 import ApolloClient from "apollo-client";
@@ -8,8 +8,7 @@ import GameEditor from "../GameEditor";
 import {SelectParam} from "antd/es/menu";
 import {LoadingMessage} from "../common/LoadingMessage";
 
-const { Header, Content, Footer, Sider } = Layout;
-const { SubMenu } = Menu;
+const { Content, Footer, Sider } = Layout;
 
 interface HomeLayoutProps extends RouteComponentProps {
     client: ApolloClient<LocalCache>

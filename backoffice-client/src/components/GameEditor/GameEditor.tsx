@@ -1,36 +1,42 @@
 import * as React from 'react';
 import {Query, QueryResult} from "react-apollo";
-import {queryHandler} from "../common/apolloHelpers";
 import {GamesTable} from "./GamesTable";
 import {GameLotsTable} from "./GameLotsTable";
 import {GET_GAMES_AND_LOTS, GetGamesAndLotsResponse} from "../common/apolloQueries";
-import {Button, Icon, Modal, PageHeader, Tabs} from "antd";
+import {Button, Icon, PageHeader, Tabs} from "antd";
 import {useState} from "react";
-import {CreateGameModal } from "./CreateGameModal";
-import {CreateGameLotModal } from "./CreateGameLotModal";
-import {RouteProps, RouterProps} from "react-router";
+import {GameEditorModal } from "./GameEditorModal";
+import {GameLotEditorModal } from "./GameLotEditorModal";
+import {RouteProps} from "react-router";
+import {Game, GameLot} from "../common/consts";
 
 const GameEditor:React.FunctionComponent<RouteProps> = function (props) {
     const activeTab = props.location && props.location.hash === "#lots" ? "lots" : "games";
-    const [showCreateGameModal, setShowCreateGameModal] = useState(false)
-    const [showCreateGameLotModal, setShowCreateGameLotModal] = useState(false)
+    const [showGameEditorModal, setShowGameEditorModal] = useState(false)
+    const [showGameLotEditorModal, setShowGameLotEditorModal] = useState(false)
+    const [editedGameLot, setEditedGameLot] = useState<GameLot>();
+    const [editedGame, setEditedGame] = useState<Game>();
 
-    function openCreateGameModal () {
-        setShowCreateGameModal(true);
+    function openGameEditorModal (game?: Game) {
+        setEditedGame(game || undefined);
+        setShowGameEditorModal(true);
         window.location.hash = 'games';
     }
 
-    function closeCreateGameModal () {
-        setShowCreateGameModal(false);
+    function closeGameEditorModal () {
+        setShowGameEditorModal(false);
+        setEditedGame(undefined);
     }
 
-    function openCreateGameLotModal () {
-        setShowCreateGameLotModal(true);
+    function openGameLotEditorModal (gameLot?: GameLot) {
+        setEditedGameLot(gameLot || undefined);
+        setShowGameLotEditorModal(true);
         window.location.hash = 'lots';
     }
 
-    function closeCreateGameLotModal () {
-        setShowCreateGameLotModal(false);
+    function closeGameLotEditorModal () {
+        setShowGameLotEditorModal(false);
+        setEditedGameLot(undefined);
     }
 
     function onTabChange(activeKey: string) {
@@ -47,24 +53,24 @@ const GameEditor:React.FunctionComponent<RouteProps> = function (props) {
                     subTitle={activeTab === 'games' ? 'Jeux' : 'Lots'}
                     backIcon={false}
                     extra={[
-                        <Button key="1" onClick={openCreateGameModal}><Icon type="plus" /> Jeu</Button>,
-                        <Button key="2" onClick={openCreateGameLotModal}><Icon type="plus" /> Lot</Button>,
+                        <Button key="1" onClick={() => openGameEditorModal()} type="primary"><Icon type="plus" /> Jeu</Button>,
+                        <Button key="2" onClick={() => openGameLotEditorModal()} type="primary"><Icon type="plus" /> Lot</Button>,
                     ]}
                     footer={
                         <Tabs activeKey={activeTab} animated={false} onChange={onTabChange}>
                             <Tabs.TabPane tab="Jeux" key="games">
-                                <GamesTable result={result} reloadGames={refetch} createGame={openCreateGameModal} />
+                                <GamesTable result={result} reloadGames={refetch} editGame={openGameEditorModal} />
                             </Tabs.TabPane>
                             <Tabs.TabPane tab="Lots" key="lots">
-                                <GameLotsTable result={result} reloadGameLots={refetch} createLot={openCreateGameLotModal} />
+                                <GameLotsTable result={result} reloadGameLots={refetch} editLot={openGameLotEditorModal} />
                             </Tabs.TabPane>
                         </Tabs>
                     }
                 />
                 {!loading && !error && data &&
                     <React.Fragment>
-                        <CreateGameModal close={closeCreateGameModal} visible={showCreateGameModal} reloadGames={refetch} />
-                        <CreateGameLotModal close={closeCreateGameLotModal} visible={showCreateGameLotModal} reloadLots={refetch} poolId={data.lotPool._id} />
+                        <GameEditorModal close={closeGameEditorModal} visible={showGameEditorModal} reloadGames={refetch} editedGame={editedGame} />
+                        <GameLotEditorModal close={closeGameLotEditorModal} visible={showGameLotEditorModal} reloadLots={refetch} poolId={data.lotPool._id} editedLot={editedGameLot} />
                     </React.Fragment>
                 }
             </React.Fragment>
