@@ -4,6 +4,7 @@ import {PORT, SOCKET_PASSWORD} from "./common/consts";
 import * as SocketIO from "socket.io";
 import * as express from 'express'
 import {GameRunner} from "./GameRunner";
+import ioService from './ioService'
 
 const app = express();
 const httpServer = http.createServer(app);
@@ -14,7 +15,8 @@ socketIOServer.use(function (socket, next) {
     next(new Error('Authentication error'));
 });
 
-GameRunner.start(socketIOServer);
+ioService.start(socketIOServer);
+GameRunner.start();
 
 httpServer.listen(PORT);
 

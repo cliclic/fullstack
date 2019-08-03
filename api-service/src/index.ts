@@ -6,15 +6,15 @@ import { createAuthServer } from './authentication/authenticationServer'
 import commonSchema from './modules/common/schema';
 import {userSchema} from "./modules/user";
 import {gameSchema, startGameService} from "./modules/game";
-import {startRealtimeService} from "./modules/common/realtimeService";
 import * as http from "http";
 import * as SocketIO from "socket.io";
 import {merge} from 'lodash';
+import {realtimeApiService} from "./modules/realtimeApi";
 
 const app = express();
 const httpServer = http.createServer(app);
 const socketIOServer = SocketIO(httpServer, {pingTimeout: 10000, pingInterval: 10000});
-startRealtimeService(socketIOServer);
+realtimeApiService.start(socketIOServer);
 
 app.use(function (req: http.IncomingMessage, res, next) {
   next();

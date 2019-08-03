@@ -85,6 +85,9 @@ class Game extends Typegoose {
     @prop({default: false})
     completed: boolean
 
+    @prop({default: false})
+    started: boolean
+
     @prop({ required: true, index: true })
     startAt: Date;
 
@@ -102,6 +105,9 @@ class Game extends Typegoose {
 
     @prop({ required: true })
     timeSlots: [GameTimeSlot];
+
+    @prop()
+    winningDelay?: number
 
     @prop()
     createdAt: Date

@@ -1,47 +1,76 @@
 import {Schema} from "mongoose";
 import ObjectId = Schema.Types.ObjectId;
-import {GameInstance, GameLotModel, GameModel, GameShotInstance, GameShotModel} from "../../api-service/src/modules/game/GameEntity";
+import {GameInstance, GameLotModel, GameModel, GameShotModel} from "../../api-service/src/modules/game/GameEntity";
 import {isModel} from "./common/helpers";
-import * as SocketIO from "socket.io";
+import ioService from './ioService';
+import {GameServiceMessageType} from "./consts";
 
 export class GameRunner {
     static runners = new Map<ObjectId, GameRunner>();
     static loopInterval = 1000;
     static gameLoopInterval = 1000;
-    static realTimeServer: SocketIO.Server;
 
-    static start(io: SocketIO.Server) {
-        this.realTimeServer = io;
+    static start() {
         setInterval(async () => {
             const now = new Date();
 
             try {
-                const gamesToRun = await GameModel.find({starAt: {$lte: now}, endAt: {$gt: now}});
-                this.runners.forEach((runner, id) => {
-                    if (gamesToRun.find(game => runner.game._id === id)) {
-                        runner.startLoop();
-                        this.runners.delete(id);
-                    }
-                });
+                const gamesToRun = await GameModel.find({starAt: {$lte: now}, endAt: {$gt: now}, completed: false});
                 gamesToRun.forEach((game) => {
-                    this.runners.set(game._id, new GameRunner(game))
+                    if (!this.runners.has(game._id)) {
+                        this.runners.set(game._id, new GameRunner(game));
+                    }
                 });
             } catch (e) {
                 console.error (e);
             }
         }, GameRunner.loopInterval);
+
+        ioService.io.onconnection( (socket) => {
+            socket.emit(GameServiceMessageType.init, {
+                runningGames: Array.from(this.runners.values()).map(runner => runner.game),
+                timestamp: Date.now()
+            });
+        })
     }
 
     game: GameInstance;
+    winningDelay: number;
     loop: NodeJS.Timeout;
 
     constructor(game) {
         this.game = game;
+        this.startLoop();
     }
 
-    startLoop() {
+    async startLoop() {
         if (!this.loop) {
             this.loop = setInterval(this.loopFn.bind(this), GameRunner.gameLoopInterval);
+            this.loopFn();
+            this.game.started = true;
+            try
+            {
+                await this.game.save();
+            } catch (e) {
+                console.error(e)
+            }
+            ioService.sendGameStart(this.game);
+        }
+    }
+
+    updateCurrentWinningDelay(game: GameInstance = this.game) {
+        const nowDate = new Date();
+        const now = nowDate.getMinutes() * 60000 + nowDate.getSeconds() * 1000 + nowDate.getMilliseconds();
+        const currentTimeSlot = game.timeSlots.find(timeSlot => now >= timeSlot.startTime && now < timeSlot.endTime);
+        let newDelay;
+        if (currentTimeSlot) {
+            newDelay = currentTimeSlot.data.winningDelay;
+        } else {
+            newDelay = 30000;
+        }
+        if (newDelay !== this.winningDelay) {
+            if (this.winningDelay) ioService.sendGameWinningDelayChange(this.game, newDelay);
+            this.winningDelay = newDelay;
         }
     }
 
@@ -57,32 +86,39 @@ export class GameRunner {
             console.warn('Game refresh fail', e);
         }
 
+        if (new Date() >= this.game.endAt) {
+            return this.endGame();
+        }
+
         if (!this.game.currentLot) {
             const hasNextLot = await this.startNextLot();
             if (!hasNextLot) {
                 return this.endGame();
+            } else {
+                ioService.sendGameLotChange(this.game);
             }
         }
+
+        this.updateCurrentWinningDelay();
 
         const now = Date.now();
         try {
             const count = await GameShotModel.count({game: this.game});
             if (count > 0) {
-                const lastShot = await GameShotModel.findOne({game: this.game, createdAt: {$gte: now - this.game.winningDelay}});
+                const lastShot = await GameShotModel.findOne({game: this.game, createdAt: {$gte: now - this.winningDelay}});
                 if (!lastShot) {
                     const winnerShot = await GameShotModel.findOne({game: this.game}).sort('createdAt');
                     if (isModel(this.game.currentLot)) {
                         this.game.currentLot.winnerShot = winnerShot;
                         await this.game.currentLot.save();
 
-                        GameRunner.realTimeServer.emit('winner', {
-                            lot: this.game.currentLot,
-                            timestamp: Date.now()
-                        });
+                        ioService.sendWinner(this.game.currentLot);
 
                         const hasNextLot = await this.startNextLot();
                         if (!hasNextLot) {
                             return this.endGame();
+                        } else {
+                            ioService.sendGameLotChange(this.game);
                         }
                     }
                 }
@@ -100,8 +136,17 @@ export class GameRunner {
     }
 
     async endGame() {
+        this.stopLoop();
         this.game.completed = true;
-        await this.game.save();
+        this.game.started = false;
+        GameRunner.runners.delete(this.game._id);
+        try
+        {
+            await this.game.save();
+        } catch (e) {
+            console.error(e);
+        }
+        ioService.sendGameEnd(this.game);
     }
 
     async startNextLot() {
