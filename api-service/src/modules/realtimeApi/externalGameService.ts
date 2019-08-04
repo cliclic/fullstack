@@ -26,8 +26,16 @@ gameServiceSocket.on(GameServiceMessageType.init, function (data) {
 });
 
 gameServiceSocket.on(GameServiceMessageType.gameStart, function (data) {
-    if (!runningGames.has(data.game._id)) {
-        runningGames.set(data.game._id, new RealtimeApiGameManager(data.game._id));
+    if (!runningGames.has(data.gameId)) {
+        runningGames.set(data.gameId, new RealtimeApiGameManager(data.gameId));
+    }
+});
+
+gameServiceSocket.on(GameServiceMessageType.gameEnd, function (data) {
+    const game = runningGames.get(data.gameId);
+    if (game) {
+        runningGames.delete(data.gameId);
+        game.destroy();
     }
 });
 

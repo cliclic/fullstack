@@ -1,7 +1,7 @@
 import {GameInstance, GameLotModel, GameLotPoolInstance, GameLotPoolModel, GameModel, GameShotModel} from './GameEntity'
 import {GameInput, GameShotInput, GameLotInput} from "./consts";
-import * as realTimeService from "../common/realtimeService";
 import {NotificationType} from "../common/consts";
+import {realtimeApiService} from "../realtimeApi";
 
 export async function count () {
     return await GameModel.countDocuments();
@@ -34,7 +34,7 @@ export async function createShot(input: GameShotInput) {
     });
 
     await gameShot.save();
-    realTimeService.notify({
+    realtimeApiService.notify({
         type: NotificationType.newShot,
         data: gameShot,
         timestamp: Date.now()
@@ -112,7 +112,7 @@ export async function deleteGameLot(poolId, id) {
 }
 
 export function start() {
-    realTimeService.io.on('new-shot', async function (data: GameShotInput) {
+    realtimeApiService.io.on('new-shot', async function (data: GameShotInput) {
         createShot(data);
     });
 }

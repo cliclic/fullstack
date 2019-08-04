@@ -8,7 +8,9 @@ export const GAME_SERVICE_URL: string = get('GAME_SERVICE_URL')
 
 export enum NotificationType {
     newShot = 'new-shot',
-    winner = 'winner'
+    winner = 'winner',
+    lotChange = 'lot-change',
+    winningDelayChange = 'winning-delay-change',
 }
 
 export enum QueryResponseStatus {

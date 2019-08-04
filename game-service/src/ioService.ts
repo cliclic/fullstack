@@ -20,7 +20,7 @@ function sendWinner(winnedLot: GameLotInstance) {
 
 function sendGameStart(game: GameInstance) {
     io.emit(GameServiceMessageType.gameStart, {
-        game,
+        gameId: game._id,
         timestamp: Date.now()
     });
 }
@@ -48,20 +48,11 @@ function sendGameWinningDelayChange(game: GameInstance, winningDelay: number) {
     })
 }
 
-function sendRunningGames(games: GameInstance[]) {
-    io.emit(GameServiceMessageType.runningGames, {
-        games,
-        timestamp: Date.now()
-    })
-}
-
 export default {
     start,
-    io,
     sendWinner,
     sendGameStart,
     sendGameEnd,
     sendGameLotChange,
     sendGameWinningDelayChange,
-    sendRunningGames,
 }

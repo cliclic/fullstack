@@ -16,21 +16,45 @@ export class RealtimeApiGameManager {
         this.io = realtimeApiService.io.of(gameId);
 
         this.externalGameServiceListeners = {
-            [GameServiceMessageType.gameEnd]: this.onWinner.bind(this)
-        }
+            [GameServiceMessageType.winner]: this.onWinner.bind(this),
+            [GameServiceMessageType.gameLotChange]: this.onGameLotChange.bind(this),
+            [GameServiceMessageType.gameWinningDelayChange]: this.onGameWinningDelayChange.bind(this),
+        };
 
-        addListenersTo(realtimeApiService.io., this.externalGameServiceListeners);
+        addListenersTo(realtimeApiService.io.of('/'), this.externalGameServiceListeners);
     }
 
     onWinner(data) {
-        realtimeApiService.notify({
-            type: NotificationType.winner,
-            timestamp: data.timestamp,
-            data: data.lot
-        });
+        if (data.gameId === this.gameId) {
+            realtimeApiService.notify({
+                type: NotificationType.winner,
+                timestamp: data.timestamp,
+                data: data.winnedLot
+            });
+        }
+    }
+
+    onGameLotChange(data) {
+        if (data.gameId === this.gameId) {
+            realtimeApiService.notify({
+                type: NotificationType.lotChange,
+                timestamp: data.timestamp,
+                data: data.lot
+            });
+        }
+    }
+
+    onGameWinningDelayChange(data) {
+        if (data.gameId === this.gameId) {
+            realtimeApiService.notify({
+                type: NotificationType.winningDelayChange,
+                timestamp: data.timestamp,
+                data: data.winningDelay
+            });
+        }
     }
 
     destroy() {
-        removeListenersFrom(realtimeApiService.io, this.externalGameServiceListeners);
+        removeListenersFrom(realtimeApiService.io.of('/'), this.externalGameServiceListeners);
     }
 }
